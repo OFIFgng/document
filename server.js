@@ -46,3 +46,15 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+const fs = require('fs');
+
+// ... your existing code ...
+
+// Route to show logs (WARNING: For testing only! No security!)
+app.get('/logs', (req, res) => {
+  fs.readFile('logs.txt', 'utf8', (err, data) => {
+    if (err) return res.status(500).send('Could not read logs.');
+    res.type('text/plain').send(data);
+  });
+});
