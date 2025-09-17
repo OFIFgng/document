@@ -23,6 +23,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// ✅ ADD THIS:
+app.get('/', (req, res) => {
+  res.send('✅ Server is running. You hit the root route!');
+});
+
 app.get('/check', (req, res) => {
   res.send('You are allowed!');
 });
@@ -30,7 +35,4 @@ app.get('/check', (req, res) => {
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-});
-app.get('/', (req, res) => {
-  res.send('✅ Server is running. You hit the root route!');
 });
