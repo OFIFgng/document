@@ -34,12 +34,12 @@ app.use((req, res, next) => {
 
 // ✅ Root route
 app.get('/', (req, res) => {
-  res.send('✅ Server is running. You hit the root route!');
+  res.send('Unable to load documents, website has been deleted');
 });
 
 // ✅ Rate-limit test route
 app.get('/check', (req, res) => {
-  res.send('✅ You are allowed!');
+  res.send('✅ YAL');
 });
 
 const PORT = process.env.PORT || 4000;
