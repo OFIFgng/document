@@ -12,13 +12,13 @@ app.use((req, res, next) => {
   const now = Date.now();
   const timestamp = new Date().toISOString();
 
-  // ✅ Log the IP to a file
+  // Log the IP to a file
   const logLine = `${timestamp} - ${ip}\n`;
   fs.appendFile('logs.txt', logLine, err => {
     if (err) console.error('Failed to log IP:', err);
   });
 
-  // ✅ Rate limiting logic
+  // Rate limiting logic
   if (!ipRequestMap[ip]) ipRequestMap[ip] = [];
 
   // Remove requests older than 1 minute
@@ -32,24 +32,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ Root route
+// Root route
 app.get('/', (req, res) => {
   res.send('Unable to load documents, website has been deleted');
 });
 
-// ✅ Rate-limit test route
+// Rate-limit test route
 app.get('/check', (req, res) => {
   res.send('✅ YAL');
 });
-
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-const fs = require('fs');
-
-// ... your existing code ...
 
 // Route to show logs (WARNING: For testing only! No security!)
 app.get('/logs', (req, res) => {
@@ -57,4 +48,9 @@ app.get('/logs', (req, res) => {
     if (err) return res.status(500).send('Could not read logs.');
     res.type('text/plain').send(data);
   });
+});
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
