@@ -2,54 +2,54 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 
-// ✅ Trust proxy so Render forwards the real IP
+
 app.set('trust proxy', true);
 
-const RATE_LIMIT = 5; // Max 5 requests
-const TIME_WINDOW = 60000; // 1 minute in milliseconds
+const RATE_LIMIT = 5;
+const TIME_WINDOW = 60000;
 const LOG_FILE = 'logs.txt';
-const LOGS_PASSWORD = 'admin123'; // Change this password later!
+const LOGS_PASSWORD = 'S&bdWBA^WVGsdvg&^!^GYSAvD^!SAV61gsaAgdHU*87qpsidjglQSbfoAhjbf891092785812*1489JsoQ317';
 
 const ipRequestMap = {};
 
-// ✅ Log IPs and apply rate limiting
+
 app.use((req, res, next) => {
   const ip = req.ip || req.connection.remoteAddress;
   const now = Date.now();
   const timestamp = new Date().toISOString();
 
-  // Log the IP to logs.txt
+ 
   const logLine = `${timestamp} - ${ip}\n`;
   fs.appendFile(LOG_FILE, logLine, err => {
     if (err) console.error('Failed to log IP:', err);
   });
 
-  // Rate limiting logic
+ 
   if (!ipRequestMap[ip]) ipRequestMap[ip] = [];
 
-  // Keep only requests in the last minute
+  
   ipRequestMap[ip] = ipRequestMap[ip].filter(time => now - time < TIME_WINDOW);
 
   if (ipRequestMap[ip].length >= RATE_LIMIT) {
-    return res.status(429).send('Too many requests. Try later.');
+    return res.status(429).send('AY! Stop it! You have been banned for a few seconds, BAD DOG!');
   }
 
   ipRequestMap[ip].push(now);
   next();
 });
 
-// ✅ Homepage
+
 app.get('/', (req, res) => {
-  res.send('✅ Server is running. IP is logged.');
+  res.send('Unable to load documents.');
 });
 
-// ✅ Optional test route
+
 app.get('/check', (req, res) => {
   const ip = req.ip || req.connection.remoteAddress;
-  res.send(`✅ YAL — Your IP is: ${ip}`);
+  res.send(`Invalid`);
 });
 
-// ✅ Protected /logs route
+
 app.get('/logs', (req, res) => {
   const user = req.query.user;
   const pass = req.query.pass;
@@ -64,7 +64,7 @@ app.get('/logs', (req, res) => {
   });
 });
 
-// ✅ Start the server
+
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
