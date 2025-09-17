@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs');
+const geoip = require('geoip-lite');
 const app = express();
 
 app.set('trust proxy', true);
@@ -37,7 +38,13 @@ app.use((req, res, next) => {
   const now = Date.now();
   const timestamp = new Date().toISOString();
 
-  const logLine = `${timestamp} - ${ip}\n`;
+  // Get geo info for IP
+  const geo = geoip.lookup(ip) || {};
+  const country = geo.country || 'Unknown Country';
+  const region = geo.region || 'Unknown Region';
+  const city = geo.city || 'Unknown City';
+
+  const logLine = `${timestamp} - ${ip} - ${country}, ${region}, ${city}\n`;
   fs.appendFile(LOG_FILE, logLine, err => {
     if (err) console.error('Failed to log IP:', err);
   });
@@ -47,7 +54,7 @@ app.use((req, res, next) => {
   ipRequestMap[ip] = ipRequestMap[ip].filter(time => now - time < TIME_WINDOW);
 
   if (ipRequestMap[ip].length >= RATE_LIMIT) {
-    return res.status(429).send('AY! Stop it! You have been banned for a few seconds, BAD DOG!');
+    return res.status(429).send('STOP REFRESHING THE PAGE GOD DAMN IT! Get banned for a few seconds.');
   }
 
   ipRequestMap[ip].push(now);
