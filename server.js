@@ -2,13 +2,13 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 
-const RATE_LIMIT = 5;
-const TIME_WINDOW = 60000;
+const RATE_LIMIT = 5; // Max 5 requests
+const TIME_WINDOW = 60000; // 1 minute in milliseconds
 
 const ipRequestMap = {};
 
-const LOG_USERNAME = 'OFIF';
-const LOG_PASSWORD = 'ASyhw@S&78$bds!*ashd*(bsaQ!*(@$YSAB182723179ASB1SSBuAUuds!&bvsa!@$S'; 
+const LOG_USERNAME = 'admin'; // Change to your username
+const LOG_PASSWORD = 'mypassword'; // Change to your password
 
 // Middleware to protect /logs with basic auth
 function basicAuth(req, res, next) {
@@ -19,13 +19,12 @@ function basicAuth(req, res, next) {
     return res.status(401).send('Authentication required.');
   }
 
-  // Decode base64 username:password
   const base64Credentials = auth.split(' ')[1];
   const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
   const [username, password] = credentials.split(':');
 
   if (username === LOG_USERNAME && password === LOG_PASSWORD) {
-    next(); // Auth success
+    next();
   } else {
     res.setHeader('WWW-Authenticate', 'Basic realm="Logs Area"');
     return res.status(401).send('Access denied.');
@@ -45,8 +44,6 @@ app.use((req, res, next) => {
 
   // Rate limiting logic
   if (!ipRequestMap[ip]) ipRequestMap[ip] = [];
-
-  // Remove requests older than TIME_WINDOW
   ipRequestMap[ip] = ipRequestMap[ip].filter(time => now - time < TIME_WINDOW);
 
   if (ipRequestMap[ip].length >= RATE_LIMIT) {
@@ -57,17 +54,18 @@ app.use((req, res, next) => {
   next();
 });
 
-// Root route
+// ✅ Root route
 app.get('/', (req, res) => {
   res.send('Unable to load documents, website has been deleted');
 });
 
-// Rate-limit test route
+// ✅ Updated /check route — shows visitor IP
 app.get('/check', (req, res) => {
-  res.send('✅ YAL');
+  const ip = req.ip || req.connection.remoteAddress;
+  res.send(`✅ YAL — Your IP is: ${ip}`);
 });
 
-// Protect /logs with basic auth
+// ✅ Protected /logs route
 app.get('/logs', basicAuth, (req, res) => {
   fs.readFile('logs.txt', 'utf8', (err, data) => {
     if (err) return res.status(500).send('Could not read logs.');
